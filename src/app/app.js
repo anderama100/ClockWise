@@ -1,8 +1,22 @@
 import React, { Component } from 'react';
-
+import { render } from 'react-dom';
+import moment from 'moment';
 /*
   Componentes de PrimeReact
 */
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
+import { Dialog } from 'primereact/dialog';
+import { TabView, TabPanel } from 'primereact/tabview';
+import { Calendar } from 'primereact/calendar';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { ScrollPanel } from 'primereact/scrollpanel';
+
+import 'primereact/resources/themes/nova-light/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+
 class App extends Component {
 
     constructor() {
