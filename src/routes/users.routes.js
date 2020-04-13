@@ -1,12 +1,31 @@
 // Modulo Express
-const express = require('express');
+const express = require('express'),bodyParser = require('body-parser'), jwt = require('jsonwebtoken'), config = require('../../configs/config');
 const router = express.Router();
 
 // Definimos en la constante el Schema que se va a manejar
 const UsersMongo = require('../models/users');
 
-// Empezamos a definicar tareas para exponer mediantes REST para la estructura usuarios.
+// JWT -- Protege toda la API mediante JWT y validacion de Token.
+router.use((req, res, next) => {
+    const token = req.headers['access-token'];
+    const llave=config.llave;
+    if (token) {
+      jwt.verify(token, llave, (err, decoded) => {      
+        if (err) {
+          return res.json({ estado: "ERROR", mensaje: 'Token incorrecto, no procede autenticacion.'  });    
+        } else {
+          req.decoded = decoded;    
+          next();
+        }
+      });
+    } else {
+      res.send({ 
+         estado: "ERROR", mensaje: 'No se ha recibido token de autenticacion' 
+      });
+    }
+ });
 
+// Empezamos a definicar tareas para exponer mediantes REST para la estructura usuarios.
 // Consultar todos los usuarios en la base de datos.
 router.get('/', async (req, res) => {
     const users = await UsersMongo.find();
@@ -40,8 +59,31 @@ router.post('/', async (req, res) => {
 
 });
 
+// Actualizar usuarios mediante PUT.
+router.put('/:id', async (req, res) => {
+    try {
+        const { login, encPassword, firstName, lastName,lastLogin,locked } = req.body;
+        // Parametros de usuario a actualizar
+        const updateUser = { login, encPassword, firstName, lastName,lastLogin,locked };
 
+        if (updateUser.login.toString() == "" || updateUser.encPassword.toString() == "" || updateUser.firstName.toString() === "") {
+            res.json({ estado: "ERROR", mensaje: "La Estructura JSON no esta Completa para la actualizacion" });
+        }
+        else {
+            await UsersMongo.findByIdAndUpdate(req.params.id,updateUser);
+            res.json({ estado: "OK", mensaje: "Usuario actualizado Correctamente" });
+        }
+    } catch (error) {
+        res.json({ estado: "ERROR", mensaje: error.toString() });
+    }
 
+});
+
+// Borrado de usuario by ID
+router.delete('/:id',async(req,res)=>{
+    await UsersMongo.findByIdAndRemove(req.params.id);
+    res.json({ estado: "OK", mensaje: "Usuario eliminado Correctamente" });
+});
 
 // Consultar Usuarios by login y clave
 router.get('/:login/:pass', async (req, res) => {
