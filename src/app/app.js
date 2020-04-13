@@ -54,6 +54,38 @@ class App extends Component {
         e.preventDefault();
     }
 
+    crearTarea(e) {
+        // Generar token para la peticion y realizar peticion anidada
+        this.generateToken().then(res => res.json()).then(data => {
+            // Llamado a WS Rest de Creacion de Tarea 
+            var dateFormated = moment(this.state.newTareaDate).format('DD-MM-YYYY');
+            console.log("Format:" + dateFormated);
+            // llamar rest de creacion
+            fetch('/portal/api/rest/appointment/', {
+                method: 'POST',
+                body: JSON.stringify({ "login": this.state.usuarioLogin, "dateFormated": dateFormated, "date": this.state.newTareaDate, "title": this.state.newTareaTitulo, "description": this.state.newTareaDescripcion, "active": true, "color": "none" }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'access-token': data.token
+                }
+            }).then(res => res.json())
+                .then(data => {
+                    this.setState({ dialogVisible: true });
+                    this.setState({ dialogText: data.mensaje });
+
+                    if (data.estado === 'OK') {
+                        this.setState({ newTareaDate: null, newTareaDescripcion: '', newTareaTitulo: '' });
+                    }
+                    // Refrescar los dias del usuario.
+                    this.cargarDiasMalla();
+                })
+                .catch(err => console.error(err));
+        });
+        e.preventDefault();
+    }
+
+
     render() {
         return (
             <div>
