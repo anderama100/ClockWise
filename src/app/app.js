@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 import moment from 'moment';
 /*
-  Componentes de PrimeReact
+  PrimeReact Components
 */
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -20,10 +20,10 @@ import 'primeicons/primeicons.css';
 class App extends Component {
 
     constructor() {
-        // llamar al Constructor de quien heredamos.
+        
         super();
         this.state = { token: 0, logged: false, usuarioLogin: '', passwordLogin: '', citas: [], dates: [], dateCalendar: null, newTareaTitulo: '', newTareaDescripcion: '', newTareaDate: null };
-        // Vincular metodos a la clase principal.
+        // Link methods to main class.
         this.login = this.login.bind(this);
         this.generateToken = this.generateToken.bind(this);
         this.seleccionarDia = this.seleccionarDia.bind(this);
