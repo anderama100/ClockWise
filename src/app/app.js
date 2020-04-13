@@ -34,21 +34,21 @@ class App extends Component {
         this.eliminarRegistro = this.eliminarRegistro.bind(this);
     }
 
-    /* Se ejecuta una vez iniciado el componente*/
+    /* Executed when component is initialized*/
     componentDidMount() {
-        // Propiedades para Dialogs
+        // Dialogs properties
         this.setState({ dialogVisible: false });
         this.setState({ dialogText: '' });
         this.setState({ dialogDetalleVisible: false });
     }
 
     /**
-     * Metodo de autenticacion
+     * Auth method
      */
     login(e) {
-        // Generar token para la peticion y realizar peticion anidada
+        // Token Request /  Perform nested petition
         this.generateToken().then(res => res.json()).then(data => {
-            // Llamado a WS Rest de Autenticacion.
+            // Auth called to WS Rest
             if (this.state.usuarioLogin !== '') {
                 fetch('/portal/api/rest/users/' + this.state.usuarioLogin + '/' + this.state.passwordLogin, {
                     headers: {
@@ -57,7 +57,7 @@ class App extends Component {
                 }).then(res => res.json()).then(data => {
                     if (data.estado == 'OK') {
                         this.setState({ logged: true });
-                        // recargamos los en BD, para evitar ReRender
+                        // reloading on DB, avoiding ReRender
                         this.cargarDiasMalla();
                     }
                     else {
@@ -68,7 +68,7 @@ class App extends Component {
             }
             else {
                 this.setState({ dialogVisible: true });
-                this.setState({ dialogText: 'Por favor ingrese un usuario / contraseña' });
+                this.setState({ dialogText: 'set user & password' });
             }
 
         });
@@ -77,15 +77,15 @@ class App extends Component {
     }
 
     /**
-     * Crear nueva tarea
+     * Create new task
      */
     crearTarea(e) {
-        // Generar token para la peticion y realizar peticion anidada
+        // Token Request /  Perform nested petition
         this.generateToken().then(res => res.json()).then(data => {
-            // Llamado a WS Rest de Creacion de Tarea 
+            // Auth called to WS Rest 
             var dateFormated = moment(this.state.newTareaDate).format('DD-MM-YYYY');
             console.log("Format:" + dateFormated);
-            // llamar rest de creacion
+            // Calling creation Rest 
             fetch('/portal/api/rest/appointment/', {
                 method: 'POST',
                 body: JSON.stringify({ "login": this.state.usuarioLogin, "dateFormated": dateFormated, "date": this.state.newTareaDate, "title": this.state.newTareaTitulo, "description": this.state.newTareaDescripcion, "active": true, "color": "none" }),
@@ -102,7 +102,7 @@ class App extends Component {
                     if (data.estado === 'OK') {
                         this.setState({ newTareaDate: null, newTareaDescripcion: '', newTareaTitulo: '' });
                     }
-                    // Refrescar los dias del usuario.
+                    // User days updatating.
                     this.cargarDiasMalla();
                 })
                 .catch(err => console.error(err));
@@ -115,16 +115,16 @@ class App extends Component {
         this.setState({ fechaSeleccion: formatDate });
 
         this.cargarDias();
-        // mostramos el Dialog con los eventos para ese dia
+        // Dialog for events of the day
         this.setState({ dialogDetalleVisible: true });
     }
     /**
-     * Consultar los dias del usuario.
+     * User days query.
      */
     cargarDias() {
-        // consultar los dias que el usuario tiene agenda
+        // Search user events agenda
         this.generateToken().then(res => res.json()).then(data => {
-            // Llamado a WS Rest de Autenticacion.
+            // Auth called WS Rest.
             fetch('/portal/api/rest/appointment/' + this.state.usuarioLogin + '/' + this.state.fechaSeleccion, {
                 headers: {
                     'access-token': data.token
@@ -136,12 +136,12 @@ class App extends Component {
     }
 
     /**
-     * Consultar los dias del usuario.
+     * 
      */
     cargarDiasMalla() {
-        // consultar los dias que el usuario tiene agenda
+        // 
         this.generateToken().then(res => res.json()).then(data => {
-            // Llamado a WS Rest de Autenticacion.
+            // 
             fetch('/portal/api/rest/appointment/' + this.state.usuarioLogin, {
                 headers: {
                     'access-token': data.token
@@ -159,11 +159,11 @@ class App extends Component {
     }
 
     /**
-     * Borrado de Tarea
+     * Task Deleting
      * @param {id registro} id 
      */
     eliminarRegistro(id){
-        if (confirm('Esta seguro de Eliminar esta Tarea?')) {
+        if (confirm('Are you sure you want to delete this task?')) {
             fetch('/portal/api/rest/appointment/' + id, {
                 method: 'DELETE',
                 headers: {
@@ -176,11 +176,11 @@ class App extends Component {
                     this.setState({ dialogText: data.mensaje });
 
                     if(data.estado==='OK'){
-                        // ocultamos el Dialog con los eventos para ese dia
+                        // Hide events Dialog 
                         this.setState({ dialogDetalleVisible: false });
                     }
 
-                    // recargar elementos en estado y en la pantalla
+                    // reload elements in state and screen
                     this.cargarDias();
                     this.cargarDiasMalla();
                 });
@@ -203,7 +203,7 @@ class App extends Component {
         return data;
     }
     /**
-     * Formateo de Fechas
+     * Date Format
      * @param {Fecha a Formatear} strDate 
      */
     getParsedDate(date) {
@@ -211,7 +211,7 @@ class App extends Component {
     }
 
     /**
-     * Plantilla para colores del calentario
+     * Template for color on calendar
      * @param {fecha} date 
      */
     dateTemplate(date) {
@@ -241,61 +241,61 @@ class App extends Component {
     render() {
         return (
             <div>
-                {/* Contenedor de Login */}
+                {/* Login Container */}
                 <div className="login-container" style={{ display: (this.state.logged ? 'none' : 'block') }}>
                     <form id="formLogin" onSubmit={this.login}>
                         <div>
-                            Por favor Ingrese las credenciales del Sistema
+                            Provide system credentials
                         </div>
-                        <div>Usuario</div>
+                        <div>User</div>
                         <div>
                             <InputText value={this.state.usuarioLogin} onChange={(e) => this.setState({ usuarioLogin: e.target.value })} />
                         </div>
-                        <div>Contraseña</div>
+                        <div>Password</div>
                         <div>
                             <Password value={this.state.passwordLogin} onChange={(e) => this.setState({ passwordLogin: e.target.value })} />
                         </div>
                         <div>
-                            <Button type="submit" label="Ingresar" tooltip="Presione aqui para Ingresar al Sistema" />
+                            <Button type="submit" label="Ingresar" tooltip="Press Here to Access" />
                         </div>
                     </form>
                 </div>
 
-                {/* Contenedor de Aplicacion*/}
+                {/* App Container*/}
                 <div className="agenda-container" style={{ display: (this.state.logged ? 'block' : 'none') }}>
                     <div className="logout-button" align="right">
-                        <Button label="Salir" onClick={(e) => this.setState({ logged: false })} tooltip="Presione para Salir de Aplicacion" />
+                        <Button label="Exit" onClick={(e) => this.setState({ logged: false })} tooltip="Press Here to Exit" />
                     </div>
                     <div >
                         <TabView>
-                            <TabPanel header="Agenda Actual">
+                            <TabPanel header="Agenda">
                                 <div className="tab-container" align="center">
                                     <div className="title-text-div">
-                                        Las siguientes son las Actividades / Tareas para los proximos 3 Meses
+                                        Tasks for the following 3 months
                                     </div>
                                     <Calendar readOnlyInput={true} numberOfMonths={3} inline={true} value={this.state.dateCalendar} maxDateCount={40} onSelect={(e) => this.seleccionarDia(e)} dateTemplate={this.dateTemplate}></Calendar>
                                 </div>
                             </TabPanel>
-                            <TabPanel header="Crear Actividad">
+                            <TabPanel header="Create Task">
                                 <div>
                                     <form id="formTark" onSubmit={this.crearTarea}>
                                         <div style={{ marginBottom: '4px' }}>
-                                            Por favor Ingrese la informacion de la Actividad
+                                            Add Task Description
                                         </div>
-                                        <div>Titulo</div>
+                                        <div>Title</div>
                                         <div>
                                             <InputText value={this.state.newTareaTitulo} onChange={(e) => this.setState({ newTareaTitulo: e.target.value })} cols={60} />
                                         </div>
-                                        <div>Descripcion</div>
+                                        <div>Description</div>
                                         <div>
                                             <InputTextarea rows={4} cols={60} value={this.state.newTareaDescripcion} onChange={(e) => this.setState({ newTareaDescripcion: e.target.value })} autoResize={true} />
                                         </div>
-                                        <div>Fecha</div>
+                                        <div>Date</div>
                                         <div>
                                             <Calendar dateFormat="dd/mm/yy" value={this.state.newTareaDate} onChange={(e) => this.setState({ newTareaDate: e.value })}></Calendar>
                                         </div>
                                         <div style={{ padding: '4px' }}>
-                                            <Button label="Crear Tarea" tooltip="Presione aqui para crear la nueva tarea ingresada" type="submit" />
+                                            <Button label="Create Task" tooltip="Press here to create new task" type="submit" />
                                         </div>
                                     </form>
                                 </div>
@@ -304,13 +304,13 @@ class App extends Component {
                     </div>
                 </div>
 
-                {/* Dialog para todos los mensajes*/}
-                <Dialog header="Notificacion" visible={this.state.dialogVisible} style={{ width: '40vw' }} modal={true} onHide={() => this.setState({ dialogVisible: false })}>
+                {/* Message Dialog */}
+                <Dialog header="Notification" visible={this.state.dialogVisible} style={{ width: '40vw' }} modal={true} onHide={() => this.setState({ dialogVisible: false })}>
                     {this.state.dialogText}
                 </Dialog>
 
-                {/* Dialog para Mostrar Activiades del dia*/}
-                <Dialog header={"Se han encontrado las siguientes tareas para " + this.state.fechaSeleccion} visible={this.state.dialogDetalleVisible} style={{ width: '50vw' }} modal={true} onHide={() => this.setState({ dialogDetalleVisible: false })}>
+                {/* Dialog box for activities of the day*/}
+                <Dialog header={"Following tasks have been found for " + this.state.fechaSeleccion} visible={this.state.dialogDetalleVisible} style={{ width: '50vw' }} modal={true} onHide={() => this.setState({ dialogDetalleVisible: false })}>
                     <ScrollPanel style={{ width: '100%', height: '340px' }} className="custom">
                         <div>
                             {
