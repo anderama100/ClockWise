@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
         const newUser = new UsersMongo({ login, encPassword, firstName, lastName });
 
         if (newUser.login.toString() == "" || newUser.encPassword.toString() == "" || newUser.firstName.toString() === "") {
-            res.json({ estado: "ERROR", mensaje: 'La Estructura JSON no esta Completa' });
+            res.json({ estado: "ERROR", mensaje: 'JSON Structure in not Completed' });
         }
         else {
             // Validate user does not exist.

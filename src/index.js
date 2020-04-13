@@ -1,25 +1,45 @@
-// Modulo de Express
-const express = require('express');
-// Moduloe Path
+// Express Module , JWT, key encription and BodyParser
+const express = require('express'), bodyParser = require('body-parser'), jwt = require('jsonwebtoken'), config = require('../configs/config');
+// Path Module
 const path = require('path');
-// Importar configuracion y conexion a Mongo.
+// Mongo config & Connection.
 const { mongoose } = require('./database');
 
-// inicializacion de rutina.
-const app = express();
+// initializing.
+const app = express(); 
 
-// Configuracion Globlal del app, arranca en el puerto que le diga el contenedor o en el 400
+// JWT Configuration
+app.set('llave', config.llave);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.get('/autenticar', (req, res) => {
+    const payload = {
+        check: true
+    };
+    const token = jwt.sign(payload, app.get('llave'), {expiresIn: 1440});//2 mins
+    res.json({mensaje: 'Authentication Successful',token: token
+    });
+})
+
+// Globlal App Config, 
 app.set('port', process.env.PORT || 4000);
 
-// Routes -- API REST Express para consultas a Mongo.
+// Routes -- API REST Express & Mongo .
 app.use(express.json());
-app.use('/api/rest/users/', require('./routes/users.routes'));
+app.use('/portal/api/rest/users/', require('./routes/users.routes'));
+app.use('/portal/api/rest/secure/', require('./routes/secure.routes'));
+app.use('/portal/api/rest/appointment/', require('./routes/appointment.routes'));
 
-// Static Files -- Archivos HTML, CSS y demas recursos estaticos
+// Static Files -- HTML files, CSS 
 app.use('/portal', express.static(path.join(__dirname, 'public')));
 
-// Iniciar Servidor.
+app.get('/', function (req, res) {
+    res.redirect('/portal'); 
+});
+
+// Server Init.
 app.listen(app.get('port'), () => {
-    console.log(`Ejecutando rutina en puerto ${app.get('port')}`)
+    console.log(`Connecting on Port ${app.get('port')}`)
 }
 );
