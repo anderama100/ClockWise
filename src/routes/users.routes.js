@@ -1,4 +1,4 @@
-// Module Express
+
 const express = require('express'),bodyParser = require('body-parser'), jwt = require('jsonwebtoken'), config = require('../../configs/config');
 const router = express.Router();
 
