@@ -188,7 +188,7 @@ class App extends Component {
     }
 
     /**
-     * Genera token para peticiones REST
+     * Generate token for REST petitions
      */
     async generateToken() {
         const config = {
