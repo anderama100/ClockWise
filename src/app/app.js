@@ -23,7 +23,36 @@ class App extends Component {
     /**
      * Metodo de autenticacion
      */
+    login(e) {
+        // Generar token para la peticion y realizar peticion anidada
+        this.generateToken().then(res => res.json()).then(data => {
+            // Llamado a WS Rest de Autenticacion.
+            if (this.state.usuarioLogin !== '') {
+                fetch('/portal/api/rest/users/' + this.state.usuarioLogin + '/' + this.state.passwordLogin, {
+                    headers: {
+                        'access-token': data.token
+                    }
+                }).then(res => res.json()).then(data => {
+                    if (data.estado == 'OK') {
+                        this.setState({ logged: true });
+                        // recargamos los en BD, para evitar ReRender
+                        this.cargarDiasMalla();
+                    }
+                    else {
+                        this.setState({ dialogVisible: true });
+                        this.setState({ dialogText: data.mensaje });
+                    }
+                })
+            }
+            else {
+                this.setState({ dialogVisible: true });
+                this.setState({ dialogText: 'Por favor ingrese un usuario / contraseña' });
+            }
 
+        });
+
+        e.preventDefault();
+    }
 
     render() {
         return (
