@@ -1,4 +1,4 @@
-// Importar Mongoose
+// Import Mongoose
 const mongoose= require('mongoose');
 
 const { Schema } = mongoose;

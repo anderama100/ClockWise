@@ -1,18 +1,18 @@
-// Modulo Express
+// Module Express
 const express = require('express'),bodyParser = require('body-parser'), jwt = require('jsonwebtoken'), config = require('../../configs/config');
 const router = express.Router();
 
-// Definimos en la constante el Schema que se va a manejar
+
 const UsersMongo = require('../models/users');
 
-// JWT -- Protege toda la API mediante JWT y validacion de Token.
+// JWT -- Protect the API through JWT and Token validation.
 router.use((req, res, next) => {
     const token = req.headers['access-token'];
     const llave=config.llave;
     if (token) {
       jwt.verify(token, llave, (err, decoded) => {      
         if (err) {
-          return res.json({ estado: "ERROR", mensaje: 'Token incorrecto, no procede autenticacion.'  });    
+          return res.json({ estado: "ERROR", mensaje: 'Wrong Token, Does not authenticate.'  });    
         } else {
           req.decoded = decoded;    
           next();
@@ -20,37 +20,37 @@ router.use((req, res, next) => {
       });
     } else {
       res.send({ 
-         estado: "ERROR", mensaje: 'No se ha recibido token de autenticacion' 
+         estado: "ERROR", mensaje: 'Token missing' 
       });
     }
  });
 
-// Empezamos a definicar tareas para exponer mediantes REST para la estructura usuarios.
-// Consultar todos los usuarios en la base de datos.
+//Task defined through REST into user's structure
+// Check all users on DB.
 router.get('/', async (req, res) => {
     const users = await UsersMongo.find();
     res.json(users);
 });
 
-// Guardar nuevo Usuario, realizando validaciones.
+// Saving new user and validations
 router.post('/', async (req, res) => {
     try {
         const { login, encPassword, firstName, lastName } = req.body;
-        // inicializacion de nuevo usuario
+        // New user initialized
         const newUser = new UsersMongo({ login, encPassword, firstName, lastName });
 
         if (newUser.login.toString() == "" || newUser.encPassword.toString() == "" || newUser.firstName.toString() === "") {
             res.json({ estado: "ERROR", mensaje: 'La Estructura JSON no esta Completa' });
         }
         else {
-            // validar que el usuario no exista por Login.
+            // Validate user does not exist.
             const userQuery = await UsersMongo.findOne({ login: newUser.login });
             if (userQuery === null) {
                 await newUser.save();
-                res.json({ estado: "OK", mensaje: "Usuario Creado Correctamente" });
+                res.json({ estado: "OK", mensaje: "User Created " });
             }
             else {
-                res.json({ estado: "ERROR", mensaje: "Usuario " + newUser.login + " ya existe en base de datos" });
+                res.json({ estado: "ERROR", mensaje: "User " + newUser.login + " already exists on database" });
             }
         }
     } catch (error) {
@@ -59,19 +59,19 @@ router.post('/', async (req, res) => {
 
 });
 
-// Actualizar usuarios mediante PUT.
+// Updating users using PUT.
 router.put('/:id', async (req, res) => {
     try {
         const { login, encPassword, firstName, lastName,lastLogin,locked } = req.body;
-        // Parametros de usuario a actualizar
+        // User Parameters to Update
         const updateUser = { login, encPassword, firstName, lastName,lastLogin,locked };
 
         if (updateUser.login.toString() == "" || updateUser.encPassword.toString() == "" || updateUser.firstName.toString() === "") {
-            res.json({ estado: "ERROR", mensaje: "La Estructura JSON no esta Completa para la actualizacion" });
+            res.json({ estado: "ERROR", mensaje: "JSON Estructure is not complete to update" });
         }
         else {
             await UsersMongo.findByIdAndUpdate(req.params.id,updateUser);
-            res.json({ estado: "OK", mensaje: "Usuario actualizado Correctamente" });
+            res.json({ estado: "OK", mensaje: "User Updated" });
         }
     } catch (error) {
         res.json({ estado: "ERROR", mensaje: error.toString() });
@@ -79,22 +79,22 @@ router.put('/:id', async (req, res) => {
 
 });
 
-// Borrado de usuario by ID
+// User delete by ID
 router.delete('/:id',async(req,res)=>{
     await UsersMongo.findByIdAndRemove(req.params.id);
-    res.json({ estado: "OK", mensaje: "Usuario eliminado Correctamente" });
+    res.json({ estado: "OK", mensaje: "User Deleted" });
 });
 
-// Consultar Usuarios by login y clave
+// Search users by login and pwd
 router.get('/:login/:pass', async (req, res) => {
     const queryRequest={"login":req.params.login,"encPassword":req.params.pass};
     const userQuery = await UsersMongo.findOne(queryRequest);
 
     if(userQuery!=null){
-        res.json({ estado: "OK", mensaje: "Autenticacion Exitosa "+userQuery._id });
+        res.json({ estado: "OK", mensaje: "Authentication Success "+userQuery._id });
     }
     else{
-        res.json({ estado: "ERROR", mensaje: "Usuario " + req.params.login + " no autenticado en el sistema" });
+        res.json({ estado: "ERROR", mensaje: "User " + req.params.login + " is not authenticated" });
     }
 });
 
