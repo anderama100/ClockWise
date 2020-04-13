@@ -1,5 +1,5 @@
 /*
-  Estilos personalizados para portal de agenda MERN.
+  
 */
 body{
   background-color: gainsboro;
@@ -14,14 +14,14 @@ input{
   text-align: center !important;
 }
 
-/* Encabezado Azul */
+/* Blue Header */
 .line-header{
   width: 100%;
   min-height: 7px;
   background-color: #007ad9;
   margin-bottom: 8px;
 }
-/* Encabezado general*/
+/* General Header*/
 .header{
   text-align: center;
 }
@@ -37,13 +37,13 @@ input{
   color: #757575;
   font-size: 12px;
 }
-/* Estilos para el contenedor principal de la app*/
+/* App Container Main Styles*/
 .app-container{
   padding: 8px;
   min-height: 40vh;
   background: #58585808;
 }
-/* Pie de Pagina*/
+/* Footer*/
 .footer{
   text-align: center;
   font-weight: 300;
@@ -53,13 +53,13 @@ input{
 }
 
 /**
-  Estilos para el contenedor de Login
+  Login Container Styles
 */
 .login-container{
   text-align: center;
 }
 
-.login-container>div{
+.login-container>form>div{
   margin-bottom: 6px;
 }
 
@@ -72,8 +72,14 @@ input{
   min-height: 250px;
 }
 
+.title-text-div{
+  font-size: 14px;
+  padding: 4px;
+  font-weight: 600;
+}
+
 /**
- Estilos CSS sobreescritos de PrimeReact 
+ PrimerReact CSS Styles  
 */
 body .p-tabview .p-tabview-panels{
   background-color: #ffffff4f !important;
@@ -82,11 +88,3 @@ body .p-tabview .p-tabview-panels{
 body .p-tabview.p-tabview-top .p-tabview-nav li a, body .p-tabview.p-tabview-bottom .p-tabview-nav li a, body .p-tabview.p-tabview-left .p-tabview-nav li a, body .p-tabview.p-tabview-right .p-tabview-nav li a{
   
 }
-
-
-
-
-
-
-
-
