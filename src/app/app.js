@@ -309,10 +309,10 @@ class App extends Component {
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <Button type="submit" label="Ingresar" tooltip="Press Here for System Access" onClick={(e) => this.login(e)} />
+                                            <Button type="submit" label="LogIn" tooltip="Press Here for System Access" onClick={(e) => this.login(e)} />
                                         </td>
                                         <td>
-                                            <Button label="Registrarme" tooltip="Press here for Register" onClick={(e) => this.iniciarRegistro(e)} />
+                                            <Button label="SignUp" tooltip="Press here for Register" onClick={(e) => this.iniciarRegistro(e)} />
                                         </td>
                                     </tr>
                                 </tbody>
@@ -398,7 +398,7 @@ class App extends Component {
                                                         <td style={{ width: '84px' }}><b>Status</b></td>
                                                         <td>Active</td>
                                                         <td style={{ width: '20px' }}>
-                                                          <Button className="p-button-danger" icon="pi pi-calendar-times" style={{ width: '20px',height : '20px' }} tooltip="Presione para Eliminar Esta Tarea" onClick={() => this.eliminarRegistro(loopReg._id)}/>
+                                                          <Button className="p-button-danger" icon="pi pi-calendar-times" style={{ width: '20px',height : '20px' }} tooltip="Delete Task Here" onClick={() => this.eliminarRegistro(loopReg._id)}/>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -414,7 +414,7 @@ class App extends Component {
 
 
                 {/* Dialog for all messages*/}
-                <Dialog header="Registro" visible={this.state.dialogRegistroVisible} modal={true} onHide={() => this.setState({ dialogRegistroVisible: false })} position={"top"}>
+                <Dialog header="Register" visible={this.state.dialogRegistroVisible} modal={true} onHide={() => this.setState({ dialogRegistroVisible: false })} position={"top"}>
                     <div>
                         <form>
                             <div>
@@ -450,7 +450,7 @@ class App extends Component {
                                     </tbody>
                                 </table>
                                 <div style={{padding: '4px'}}>
-                                    <Button label="Crear Usuario" tooltip="Press here to add new user" onClick={(e) => this.realizarRegistro(e)}/>
+                                    <Button label="Create User" tooltip="Press here to add new user" onClick={(e) => this.realizarRegistro(e)}/>
                                 </div>
                             </div>
                         </form>
