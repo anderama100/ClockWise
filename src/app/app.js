@@ -20,10 +20,10 @@ import 'primeicons/primeicons.css';
 class App extends Component {
 
     constructor() {
-        
+        // 
         super();
         this.state = { token: 0, logged: false, usuarioLogin: '', passwordLogin: '', citas: [], dates: [], dateCalendar: null, newTareaTitulo: '', newTareaDescripcion: '', newTareaDate: null };
-        // Link methods to main class.
+        // Linking Methods to main class.
         this.login = this.login.bind(this);
         this.generateToken = this.generateToken.bind(this);
         this.seleccionarDia = this.seleccionarDia.bind(this);
@@ -32,6 +32,9 @@ class App extends Component {
         this.cargarDiasMalla = this.cargarDiasMalla.bind(this);
         this.dateTemplate = this.dateTemplate.bind(this);
         this.eliminarRegistro = this.eliminarRegistro.bind(this);
+        this.iniciarRegistro = this.iniciarRegistro.bind(this);
+        this.realizarRegistro = this.realizarRegistro.bind(this);
+        
     }
 
     /* Executed when component is initialized*/
@@ -40,6 +43,8 @@ class App extends Component {
         this.setState({ dialogVisible: false });
         this.setState({ dialogText: '' });
         this.setState({ dialogDetalleVisible: false });
+        this.setState({ dialogRegistroVisible: false });
+        this.setState({ today: new Date() });
     }
 
     /**
@@ -162,29 +167,73 @@ class App extends Component {
      * Task Deleting
      * @param {id registro} id 
      */
-    eliminarRegistro(id){
-        if (confirm('Are you sure you want to delete this task?')) {
-            fetch('/portal/api/rest/appointment/' + id, {
-                method: 'DELETE',
+    eliminarRegistro(id) {
+        // Search on agenda for busy days
+        if (confirm('Are you sure to delete this task?')) {
+            this.generateToken().then(res => res.json()).then(data => {
+                fetch('/portal/api/rest/appointment/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'access-token': data.token
+                    }
+                }).then(res => res.json())
+                    .then(data => {
+                        this.setState({ dialogVisible: true });
+                        this.setState({ dialogText: data.mensaje });
+    
+                        if (data.estado === 'OK') {
+                            // Hide events on Dialog for this days
+                            this.setState({ dialogDetalleVisible: false });
+                        }
+    
+                        // Reload elements on state & screen
+                        this.cargarDias();
+                        this.cargarDiasMalla();
+                });
+            });
+        }
+    }
+
+    /**
+     * Init Register Process.
+     */
+    iniciarRegistro(e) {
+        this.setState({ dialogRegistroVisible: true });
+        e.preventDefault();
+    }
+
+    /**
+     * Perfomr Register Process.
+     */
+    realizarRegistro(e) {
+        
+        // Create token for petition and create nested petition
+        this.generateToken().then(res => res.json()).then(data => {
+            // Calling REST from user creation 
+            fetch('/portal/api/rest/users/', {
+                method: 'POST',
+                body: JSON.stringify({ "login": this.state.usuarioRegistro, "encPassword": this.state.passwordRegistro, "firstName": this.state.nombresRegistro, "lastName": this.state.apellidoRegistro}),
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'access-token': data.token
                 }
             }).then(res => res.json())
                 .then(data => {
                     this.setState({ dialogVisible: true });
                     this.setState({ dialogText: data.mensaje });
 
-                    if(data.estado==='OK'){
-                        // Hide events Dialog 
-                        this.setState({ dialogDetalleVisible: false });
+                    if (data.estado === 'OK') {
+                        this.setState({ dialogRegistroVisible: false });
+                        this.setState({ newTarusuarioRegistroeaDate: null, passwordRegistro: '', nombresRegistro: '',apellidoRegistro: '' });
                     }
-
-                    // reload elements in state and screen
-                    this.cargarDias();
-                    this.cargarDiasMalla();
-                });
-        }
+                })
+                .catch(err => console.error(err));
+        });
+                
+        e.preventDefault();
     }
 
     /**
@@ -253,10 +302,21 @@ class App extends Component {
                         </div>
                         <div>Password</div>
                         <div>
-                            <Password value={this.state.passwordLogin} onChange={(e) => this.setState({ passwordLogin: e.target.value })} />
+                        <Password value={this.state.passwordLogin} onChange={(e) => this.setState({ passwordLogin: e.target.value })} />
                         </div>
-                        <div>
-                            <Button type="submit" label="Ingresar" tooltip="Press Here to Access" />
+                        <div align="center">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <Button type="submit" label="Ingresar" tooltip="Press Here for System Access" onClick={(e) => this.login(e)} />
+                                        </td>
+                                        <td>
+                                            <Button label="Registrarme" tooltip="Press here for Register" onClick={(e) => this.iniciarRegistro(e)} />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </form>
                 </div>
@@ -320,23 +380,23 @@ class App extends Component {
                                             <table key={"date" + loopReg._id} style={{ width: '100%' }}>
                                                 <tbody>
                                                     <tr>
-                                                        <td style={{ width: '84px' }}><b>Titulo</b></td>
+                                                        <td style={{ width: '84px' }}><b>Title</b></td>
                                                         <td>{loopReg.title}</td>
                                                         <td style={{ width: '20px' }}></td>
                                                     </tr>
                                                     <tr>
-                                                        <td style={{ width: '84px' }}><b>Fecha</b></td>
+                                                        <td style={{ width: '84px' }}><b>Date</b></td>
                                                         <td>{loopReg.dateFormated}</td>
                                                         <td style={{ width: '20px' }}></td>
                                                     </tr>
                                                     <tr>
-                                                        <td style={{ width: '84px' }}><b>Descripcion</b></td>
+                                                        <td style={{ width: '84px' }}><b>Description</b></td>
                                                         <td>{loopReg.description}</td>
                                                         <td style={{ width: '20px' }}></td>
                                                     </tr>
                                                     <tr>
-                                                        <td style={{ width: '84px' }}><b>Estado</b></td>
-                                                        <td>Activa</td>
+                                                        <td style={{ width: '84px' }}><b>Status</b></td>
+                                                        <td>Active</td>
                                                         <td style={{ width: '20px' }}>
                                                           <Button className="p-button-danger" icon="pi pi-calendar-times" style={{ width: '20px',height : '20px' }} tooltip="Presione para Eliminar Esta Tarea" onClick={() => this.eliminarRegistro(loopReg._id)}/>
                                                         </td>
@@ -350,6 +410,51 @@ class App extends Component {
                             }
                         </div>
                     </ScrollPanel>
+                </Dialog>
+
+
+                {/* Dialog for all messages*/}
+                <Dialog header="Registro" visible={this.state.dialogRegistroVisible} modal={true} onHide={() => this.setState({ dialogRegistroVisible: false })} position={"top"}>
+                    <div>
+                        <form>
+                            <div>
+                                <b>Please, add new user Info.</b>
+                            </div>
+                            <div align="center">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>User</td>
+                                            <td>
+                                                <InputText id="userNew" value={this.state.usuarioRegistro} onChange={(e) => this.setState({ usuarioRegistro: e.target.value })} />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Password</td>
+                                            <td>
+                                                <Password id="passNew" value={this.state.passwordRegistro} onChange={(e) => this.setState({ passwordRegistro: e.target.value })} />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Name</td>
+                                            <td>
+                                                <InputText id="userNew" value={this.state.nombresRegistro} onChange={(e) => this.setState({ nombresRegistro: e.target.value })} />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>LastName</td>
+                                            <td>
+                                                <InputText id="userNew" value={this.state.apellidoRegistro} onChange={(e) => this.setState({ apellidoRegistro: e.target.value })} />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div style={{padding: '4px'}}>
+                                    <Button label="Crear Usuario" tooltip="Press here to add new user" onClick={(e) => this.realizarRegistro(e)}/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </Dialog>
             </div>
         )

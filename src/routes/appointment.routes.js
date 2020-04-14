@@ -1,19 +1,19 @@
-
+// Express Module
 const express = require('express'), bodyParser = require('body-parser'), jwt = require('jsonwebtoken'), config = require('../../configs/config');
 const router = express.Router();
 
-// Const of Scheme
+// 
 const AppointmentMongo = require('../models/appointment');
 
-// JWT -- Protect whole API through JWT and token validation.
-/*
+// JWT -- Protects all API through JWT and Token Validation.
+
 router.use((req, res, next) => {
     const token = req.headers['access-token'];
     const llave=config.llave;
     if (token) {
       jwt.verify(token, llave, (err, decoded) => {      
         if (err) {
-          return res.json({ estado: "ERROR", mensaje: 'Token incorrecto, no procede autenticacion.'  });    
+          return res.json({ estado: "ERROR", mensaje: 'Wrong Token, can not authenticate.'  });    
         } else {
           req.decoded = decoded;    
           next();
@@ -21,38 +21,38 @@ router.use((req, res, next) => {
       });
     } else {
       res.send({ 
-         estado: "ERROR", mensaje: 'No se ha recibido token de autenticacion' 
+         estado: "ERROR", mensaje: 'Token has not been received' 
       });
     }
  });
- */
+ 
 
-// Empezamos a definicar tareas para exponer mediantes REST para la estructura Tareas de Agenda.
-// Consultar todas las citas o tareas en la base de datos.
+// Creating new task through REST for the Agenda structure.
+// Retrieve task from DB.
 router.get('/', async (req, res) => {
     const users = await AppointmentMongo.find();
     res.json(users);
 });
 
-// Saving new task.
+// Saving new Task.
 router.post('/', async (req, res) => {
     try {
         const { login, dateFormated, date, title, description, active, color } = req.body;
-        // New Task initializated
+        // init new task 
         const newTask = new AppointmentMongo({ login, dateFormated, date, title, description, active, color });
 
         if (newTask.login.toString() == "" || newTask.dateFormated.toString() == "" || newTask.title.toString() === "") {
-            res.json({ estado: "ERROR", mensaje: 'JSON structure in not completed for a new task' });
+            res.json({ estado: "ERROR", mensaje: 'JSON Structure is not comemplete for new task' });
         }
         else {
-            // Controling duplicated task per user by title an date
+            // Checking user does not exist by login title & date
             const taskQuery = await AppointmentMongo.findOne({ login: newTask.login, dateFormated: newTask.dateFormated , title:newTask.title });
             if (taskQuery === null) {
                 await newTask.save();
-                res.json({ estado: "OK", mensaje: "Task Scheduled Successfully." });
+                res.json({ estado: "OK", mensaje: "Task Schedule Succesfully." });
             }
             else {
-                res.json({ estado: "ERROR", mensaje: "Task already exist ["+newTask.title+"] on agenda for ["+newTask.dateFormated+"]" });
+                res.json({ estado: "ERROR", mensaje: "Task Already Exists ["+newTask.title+"] On the App for  ["+newTask.dateFormated+"]" });
             }
         }
     } catch (error) {
@@ -60,13 +60,13 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Deleting Tasks
+// Deleting Task
 router.delete('/:id',async(req,res)=>{
     await AppointmentMongo.findByIdAndRemove(req.params.id);
-    res.json({ estado: "OK", mensaje: "Task Deleted" });
+    res.json({ estado: "OK", mensaje: "Task Deleted Succesfully" });
 });
 
-// Retrieving user's tasks
+// Retrieve all user tasks
 router.get('/:login', async (req, res) => {
     console.log('login:'+req.params.login);
     const queryRequest={"login":req.params.login};
@@ -76,11 +76,11 @@ router.get('/:login', async (req, res) => {
         res.json(userQuery);
     }
     else{
-        res.json({ estado: "ERROR", mensaje: "There is not task for user "+req.params.login});
+        res.json({ estado: "ERROR", mensaje: "There is not tasks for user "+req.params.login});
     }
 });
 
-// consulta todas las tareas por usuario y Fecha
+// Retreive all tasks by user and date
 router.get('/:login/:fecha', async (req, res) => {    
     const queryRequest={"login":req.params.login,"dateFormated":req.params.fecha};
     const userQuery = await AppointmentMongo.find(queryRequest);
@@ -89,7 +89,7 @@ router.get('/:login/:fecha', async (req, res) => {
         res.json(userQuery);
     }
     else{
-        res.json({ estado: "ERROR", mensaje: "There is not task for user "+req.params.login+" on date "+req.params.fecha});
+        res.json({ estado: "ERROR", mensaje: "There is not tasks for user "+req.params.login+" on Date "+req.params.fecha});
     }
 });
 

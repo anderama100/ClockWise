@@ -19,7 +19,7 @@ router.post('/token', async (req, res) => {
             return res.json({ estado: "ERROR", mensaje: 'Token not Generated', token: '' });
         }
     } catch (error) {
-        return res.json({ estado: "ERROR", mensaje: 'Error creating Token '+error, token: '' });
+        return res.json({ estado: "ERROR", mensaje: 'Error Creating Token '+error, token: '' });
     }
 
 });
