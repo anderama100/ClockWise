@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
+// liberias JS paa fechas
 import moment from 'moment';
 /*
   PrimeReact Components
@@ -59,7 +60,7 @@ class App extends Component {
                     headers: {
                         'access-token': data.token
                     }
-                }).then(res => res.json()).then(data => {
+                }).then(res => res.json()).then(data => { ///promise
                     if (data.estado == 'OK') {
                         this.setState({ logged: true });
                         // reloading on DB, avoiding ReRender
@@ -87,7 +88,7 @@ class App extends Component {
     crearTarea(e) {
         // Token Request /  Perform nested petition
         this.generateToken().then(res => res.json()).then(data => {
-            // Auth called to WS Rest 
+            //  
             var dateFormated = moment(this.state.newTareaDate).format('DD-MM-YYYY');
             console.log("Format:" + dateFormated);
             // Calling creation Rest 

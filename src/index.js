@@ -18,7 +18,7 @@ app.get('/autenticar', (req, res) => {
         check: true
     };
     const token = jwt.sign(payload, app.get('llave'), {expiresIn: 1440});//2 mins
-    res.json({mensaje: 'Authentication Successful',token: token
+    res.json({mensaje: 'Token Is:',token: token
     });
 })
 

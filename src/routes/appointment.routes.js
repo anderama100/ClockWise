@@ -60,6 +60,26 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Update Task by ID
+router.put('/:id', async (req, res) => {
+    try {
+        const { login, dateFormated, date, title, description, active, color } = req.body;
+        // User Parameters to update
+        const updtateTask = { login, dateFormated, date, title, description, active, color };
+
+        if (updtateTask.login.toString() == "" || updtateTask.title.toString() == "") {
+            res.json({ estado: "ERROR", mensaje: "JSON Structure is not complete" });
+        }
+        else {            
+            await AppointmentMongo.findByIdAndUpdate(req.params.id,updtateTask);
+            res.json({ estado: "OK", mensaje: "Task Update Succesfully" });
+        }
+    } catch (error) {
+        res.json({ estado: "ERROR", mensaje: error.toString() });
+    }
+});
+
+
 // Deleting Task
 router.delete('/:id',async(req,res)=>{
     await AppointmentMongo.findByIdAndRemove(req.params.id);
