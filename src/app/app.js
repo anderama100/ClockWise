@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-// liberias JS paa fechas
 import moment from 'moment';
 /*
   PrimeReact Components
@@ -35,7 +34,7 @@ class App extends Component {
         this.eliminarRegistro = this.eliminarRegistro.bind(this);
         this.iniciarRegistro = this.iniciarRegistro.bind(this);
         this.realizarRegistro = this.realizarRegistro.bind(this);
-        
+        this.seleccionEditarRegistro = this.seleccionEditarRegistro.bind(this);
     }
 
     /* Executed when component is initialized*/
@@ -60,7 +59,7 @@ class App extends Component {
                     headers: {
                         'access-token': data.token
                     }
-                }).then(res => res.json()).then(data => { ///promise
+                }).then(res => res.json()).then(data => {
                     if (data.estado == 'OK') {
                         this.setState({ logged: true });
                         // reloading on DB, avoiding ReRender
@@ -88,58 +87,60 @@ class App extends Component {
     crearTarea(e) {
         // Token Request /  Perform nested petition
         this.generateToken().then(res => res.json()).then(data => {
-            //  
+            // Auth called to WS Rest 
             var dateFormated = moment(this.state.newTareaDate).format('DD-MM-YYYY');
-            console.log("Format:" + dateFormated);
-            // Calling creation Rest 
-            fetch('/portal/api/rest/appointment/', {
-                method: 'POST',
-                body: JSON.stringify({ "login": this.state.usuarioLogin, "dateFormated": dateFormated, "date": this.state.newTareaDate, "title": this.state.newTareaTitulo, "description": this.state.newTareaDescripcion, "active": true, "color": "none" }),
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'access-token': data.token
-                }
-            }).then(res => res.json())
-                .then(data => {
-                    this.setState({ dialogVisible: true });
-                    this.setState({ dialogText: data.mensaje });
-
-                    if (data.estado === 'OK') {
-                        this.setState({ newTareaDate: null, newTareaDescripcion: '', newTareaTitulo: '' });
+            // If it's a new task ---> Call Post of Create.
+            if (this.state.newId == null) {
+                // Calling creation Rest 
+                fetch('/portal/api/rest/appointment/', {
+                    method: 'POST',
+                    body: JSON.stringify({ "login": this.state.usuarioLogin, "dateFormated": dateFormated, "date": this.state.newTareaDate, "title": this.state.newTareaTitulo, "description": this.state.newTareaDescripcion, "active": true, "color": "none" }),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'access-token': data.token
                     }
-                    // User days updatating.
-                    this.cargarDiasMalla();
-                })
-                .catch(err => console.error(err));
-        }
-        else {
-            // Calling Update Rest                                 
-            fetch('/portal/api/rest/appointment/' + this.state.newId, {
-                method: 'PUT',
-                body: JSON.stringify({ "login": this.state.usuarioLogin, "dateFormated": dateFormated, "date": this.state.newTareaDate, "title": this.state.newTareaTitulo, "description": this.state.newTareaDescripcion, "active": true, "color": "none" }),
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'access-token': data.token
-                }
-            }).then(res => res.json())
-                .then(data => {
-                    this.setState({ dialogVisible: true });
-                    this.setState({ dialogText: data.mensaje });
+                }).then(res => res.json())
+                    .then(data => {
+                        this.setState({ dialogVisible: true });
+                        this.setState({ dialogText: data.mensaje });
 
-                    if (data.estado === 'OK') {
-                        this.setState({ newTareaDate: null, newTareaDescripcion: '', newTareaTitulo: '', newId: null });                            
-                        this.setState({ activeIndex: 0 });
+                        if (data.estado === 'OK') {
+                            this.setState({ newTareaDate: null, newTareaDescripcion: '', newTareaTitulo: '' });
+                            this.setState({ activeIndex: 0 });
+                        }
+                        // User days updatating.
+                        this.cargarDiasMalla();
+                    })
+                    .catch(err => console.error(err));
+            }
+            else {
+                // Calling Update Rest                                 
+                fetch('/portal/api/rest/appointment/' + this.state.newId, {
+                    method: 'PUT',
+                    body: JSON.stringify({ "login": this.state.usuarioLogin, "dateFormated": dateFormated, "date": this.state.newTareaDate, "title": this.state.newTareaTitulo, "description": this.state.newTareaDescripcion, "active": true, "color": "none" }),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'access-token': data.token
                     }
-                    // User days updatating.
-                    this.cargarDiasMalla();
-                })
-                .catch(err => console.error(err));
-        }
-    });
-    e.preventDefault();
-}
+                }).then(res => res.json())
+                    .then(data => {
+                        this.setState({ dialogVisible: true });
+                        this.setState({ dialogText: data.mensaje });
+
+                        if (data.estado === 'OK') {
+                            this.setState({ newTareaDate: null, newTareaDescripcion: '', newTareaTitulo: '', newId: null });                            
+                            this.setState({ activeIndex: 0 });
+                        }
+                        // User days updatating.
+                        this.cargarDiasMalla();
+                    })
+                    .catch(err => console.error(err));
+            }
+        });
+        e.preventDefault();
+    }
 
     seleccionarDia(e) {
         var formatDate = this.getParsedDate(e.value);
@@ -188,7 +189,29 @@ class App extends Component {
             })
         });
     }
-
+    /**
+     * Task updating.
+     * @param {id registro} id 
+     */
+    seleccionEditarRegistro(id) {
+        // Updating register on DB
+        this.generateToken().then(res => res.json()).then(data => {
+            fetch('/portal/api/rest/appointment/id/' + id, {
+                headers: {
+                    'access-token': data.token
+                }
+            }).then(res => res.json()).then(data => {
+                var text = String(data.date);
+                this.setState({ newTareaDate: new Date(text) });
+                this.setState({ newTareaDescripcion: data.description });
+                this.setState({ newTareaTitulo: data.title });
+                this.setState({ newId: data._id });
+                this.setState({ activeIndex: 1 });
+                this.setState({ dialogDetalleVisible: false });
+            });
+        });
+    }
+    
     /**
      * Task Deleting
      * @param {id registro} id 
@@ -208,16 +231,16 @@ class App extends Component {
                     .then(data => {
                         this.setState({ dialogVisible: true });
                         this.setState({ dialogText: data.mensaje });
-    
+
                         if (data.estado === 'OK') {
                             // Hide events on Dialog for this days
                             this.setState({ dialogDetalleVisible: false });
                         }
-    
+
                         // Reload elements on state & screen
                         this.cargarDias();
                         this.cargarDiasMalla();
-                });
+                    });
             });
         }
     }
@@ -234,13 +257,12 @@ class App extends Component {
      * Perfomr Register Process.
      */
     realizarRegistro(e) {
-        
         // Create token for petition and create nested petition
         this.generateToken().then(res => res.json()).then(data => {
             // Calling REST from user creation 
             fetch('/portal/api/rest/users/', {
                 method: 'POST',
-                body: JSON.stringify({ "login": this.state.usuarioRegistro, "encPassword": this.state.passwordRegistro, "firstName": this.state.nombresRegistro, "lastName": this.state.apellidoRegistro}),
+                body: JSON.stringify({ "login": this.state.usuarioRegistro, "encPassword": this.state.passwordRegistro, "firstName": this.state.nombresRegistro, "lastName": this.state.apellidoRegistro }),
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -253,12 +275,12 @@ class App extends Component {
 
                     if (data.estado === 'OK') {
                         this.setState({ dialogRegistroVisible: false });
-                        this.setState({ newTarusuarioRegistroeaDate: null, passwordRegistro: '', nombresRegistro: '',apellidoRegistro: '' });
+                        this.setState({ newTarusuarioRegistroeaDate: null, passwordRegistro: '', nombresRegistro: '', apellidoRegistro: '' });
                     }
                 })
                 .catch(err => console.error(err));
         });
-                
+
         e.preventDefault();
     }
 
@@ -328,7 +350,7 @@ class App extends Component {
                         </div>
                         <div>Password</div>
                         <div>
-                        <Password value={this.state.passwordLogin} onChange={(e) => this.setState({ passwordLogin: e.target.value })} />
+                            <Password value={this.state.passwordLogin} onChange={(e) => this.setState({ passwordLogin: e.target.value })} />
                         </div>
                         <div align="center">
                             <table>
@@ -353,7 +375,7 @@ class App extends Component {
                         <Button label="Exit" onClick={(e) => this.setState({ logged: false })} tooltip="Press Here to Exit" />
                     </div>
                     <div >
-                        <TabView>
+                        <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({ activeIndex: e.index })}>
                             <TabPanel header="Agenda">
                                 <div className="tab-container" align="center">
                                     <div className="title-text-div">
@@ -362,7 +384,7 @@ class App extends Component {
                                     <Calendar readOnlyInput={true} numberOfMonths={3} inline={true} value={this.state.dateCalendar} maxDateCount={40} onSelect={(e) => this.seleccionarDia(e)} dateTemplate={this.dateTemplate}></Calendar>
                                 </div>
                             </TabPanel>
-                            <TabPanel header="Create Task">
+                            <TabPanel header={this.state.newId == null ? "Create Task" : "Update Task"}>
                                 <div>
                                     <form id="formTark" onSubmit={this.crearTarea}>
                                         <div style={{ marginBottom: '4px' }}>
@@ -381,7 +403,7 @@ class App extends Component {
                                             <Calendar dateFormat="dd/mm/yy" value={this.state.newTareaDate} onChange={(e) => this.setState({ newTareaDate: e.value })}></Calendar>
                                         </div>
                                         <div style={{ padding: '4px' }}>
-                                            <Button label="Create Task" tooltip="Press here to create new task" type="submit" />
+                                            <Button label={this.state.newId == null ? "Create Task" : "Update Task"} tooltip="Press here to create new task" type="submit" />
                                         </div>
                                     </form>
                                 </div>
@@ -409,22 +431,28 @@ class App extends Component {
                                                         <td style={{ width: '84px' }}><b>Title</b></td>
                                                         <td>{loopReg.title}</td>
                                                         <td style={{ width: '20px' }}></td>
+                                                        <td style={{ width: '20px' }}></td>
                                                     </tr>
                                                     <tr>
                                                         <td style={{ width: '84px' }}><b>Date</b></td>
                                                         <td>{loopReg.dateFormated}</td>
+                                                        <td style={{ width: '20px' }}></td>
                                                         <td style={{ width: '20px' }}></td>
                                                     </tr>
                                                     <tr>
                                                         <td style={{ width: '84px' }}><b>Description</b></td>
                                                         <td>{loopReg.description}</td>
                                                         <td style={{ width: '20px' }}></td>
+                                                        <td style={{ width: '20px' }}></td>
                                                     </tr>
                                                     <tr>
                                                         <td style={{ width: '84px' }}><b>Status</b></td>
                                                         <td>Active</td>
                                                         <td style={{ width: '20px' }}>
-                                                          <Button className="p-button-danger" icon="pi pi-calendar-times" style={{ width: '20px',height : '20px' }} tooltip="Delete Task Here" onClick={() => this.eliminarRegistro(loopReg._id)}/>
+                                                            <Button className="p-button-success" icon="pi pi-list" style={{ width: '20px', height: '20px' }} tooltip="Update Task" onClick={() => this.seleccionEditarRegistro(loopReg._id)} />
+                                                        </td>
+                                                        <td style={{ width: '20px' }}>
+                                                            <Button className="p-button-danger" icon="pi pi-calendar-times" style={{ width: '20px', height: '20px' }} tooltip="Delete Task Here" onClick={() => this.eliminarRegistro(loopReg._id)} />
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -475,8 +503,8 @@ class App extends Component {
                                         </tr>
                                     </tbody>
                                 </table>
-                                <div style={{padding: '4px'}}>
-                                    <Button label="Create User" tooltip="Press here to add new user" onClick={(e) => this.realizarRegistro(e)}/>
+                                <div style={{ padding: '4px' }}>
+                                    <Button label="Create User" tooltip="Press here to add new user" onClick={(e) => this.realizarRegistro(e)} />
                                 </div>
                             </div>
                         </form>
@@ -485,7 +513,6 @@ class App extends Component {
             </div>
         )
     }
-
 }
 
 export default App;
