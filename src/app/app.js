@@ -112,9 +112,34 @@ class App extends Component {
                     this.cargarDiasMalla();
                 })
                 .catch(err => console.error(err));
-        });
-        e.preventDefault();
-    }
+        }
+        else {
+            // Calling Update Rest                                 
+            fetch('/portal/api/rest/appointment/' + this.state.newId, {
+                method: 'PUT',
+                body: JSON.stringify({ "login": this.state.usuarioLogin, "dateFormated": dateFormated, "date": this.state.newTareaDate, "title": this.state.newTareaTitulo, "description": this.state.newTareaDescripcion, "active": true, "color": "none" }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'access-token': data.token
+                }
+            }).then(res => res.json())
+                .then(data => {
+                    this.setState({ dialogVisible: true });
+                    this.setState({ dialogText: data.mensaje });
+
+                    if (data.estado === 'OK') {
+                        this.setState({ newTareaDate: null, newTareaDescripcion: '', newTareaTitulo: '', newId: null });                            
+                        this.setState({ activeIndex: 0 });
+                    }
+                    // User days updatating.
+                    this.cargarDiasMalla();
+                })
+                .catch(err => console.error(err));
+        }
+    });
+    e.preventDefault();
+}
 
     seleccionarDia(e) {
         var formatDate = this.getParsedDate(e.value);
