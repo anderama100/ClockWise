@@ -3,6 +3,7 @@ const express = require('express'), bodyParser = require('body-parser'), jwt = r
 // Path Module
 const path = require('path');
 // Mongo config & Connection.
+require('dotenv').config();
 const { mongoose } = require('./database');
 
 // initializing.
