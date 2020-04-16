@@ -5,7 +5,7 @@
 "ClockWise" is a personalized agenda in which any user 
 can register and access to create tasks that can display the calendar.
 
-It was developed with MERN technology and the JWT standard (link).
+It was developed with MERN technology and the JWT authentication [link](https://jwt.io/introduction/)
 
 **MERN** is a web development framework. It consists of MongoDB, ExpressJS, ReactJS,
 and NodeJS as its working components. Here are the details of what each of these
@@ -36,12 +36,12 @@ certifies that only the party holding the private key is the one that signed it.
 # Technologies Used
 For this project, technologies implemented are:
 
-[x] MERN
-[x] JWT
-[x] Heroku
-[x] PrimeReact
-[x] Webpack
-[x] Babel
+- [x] MERN
+- [x] JWT
+- [x] Heroku
+- [x] PrimeReact
+- [x] Webpack
+- [x] Babel
 
 
 # Navigation
