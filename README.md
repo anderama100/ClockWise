@@ -67,6 +67,9 @@ Visualizing Events/Task
 ![Image](https://i.imgur.com/QpruGRr.jpg)
 
 
+##Trello Planning
+*(https://trello.com/b/5kUvpOp0/project-4-clockwise)
+
 ## Deployment
 *(https://clock-wise.herokuapp.com/)
 
