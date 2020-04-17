@@ -66,6 +66,13 @@ Visualizing Events/Task
 
 ![Image](https://i.imgur.com/QpruGRr.jpg)
 
+# Ice Box
+Next steps on this project would be:
+
+- Add Event Location
+- Link user's email contacts
+- Admin panel
+
 
 ## [Trello Planning](https://trello.com/b/5kUvpOp0/project-4-clockwise)
 
